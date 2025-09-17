@@ -1,5 +1,3 @@
-This project is looking for maintainers. If you are interested to give it a go, please email [me](mailto:jeromewus@gmail.com) to further discuss maintenance.
-
 ---
 <p align="center">
   <a href="#">
