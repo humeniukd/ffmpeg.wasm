@@ -30,7 +30,7 @@ RUN bash -x /src/build.sh
 # Base ffmpeg image with dependencies and source code populated.
 FROM emsdk-base AS ffmpeg-base
 RUN embuilder build sdl2 sdl2-mt
-ADD https://github.com/FFmpeg/FFmpeg.git#n5.1.4 /src
+ADD https://github.com/humeniukd/FFmpeg.git#wasm /src
 COPY --from=opus-builder $INSTALL_DIR $INSTALL_DIR
 
 # Build ffmpeg

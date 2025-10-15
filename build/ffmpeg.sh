@@ -43,6 +43,7 @@ CONF_FLAGS=(
 
     --disable-filters
     --enable-filter=aresample
+    --enable-filter=dumpwave
 
     --disable-protocols
     --enable-protocol=file
