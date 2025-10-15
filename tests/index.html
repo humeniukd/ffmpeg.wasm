@@ -20,18 +20,18 @@
             message.innerHTML = `${progress * 100} %`;
           });
           await ffmpeg.load({
-            coreURL: "/packages/core/dist/esm/ffmpeg-core.js",
+            coreURL: "/packages/core-mt/dist/esm/ffmpeg-core.js",
           });
         }
         const { name } = files[0];
         await ffmpeg.writeFile(name, await fetchFile(files[0]));
         message.innerHTML = 'Start transcoding';
-        await ffmpeg.exec(['-i', name,  'output.mp4']);
+        await ffmpeg.exec(['-i', name, '-map', '0:a:0', '-c:a', 'libopus', '-b:a', '64K', '-af', 'aresample=48000', '-ar', '48000', 'output.webm']);
         message.innerHTML = 'Complete transcoding';
-        const data = await ffmpeg.readFile('output.mp4');
+        const data = await ffmpeg.readFile('output.webm');
 
         const video = document.getElementById('output-video');
-        video.src = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
+        video.src = URL.createObjectURL(new Blob([data.buffer], { type: 'audio/webm' }));
       }
       const elm = document.getElementById('uploader');
       elm.addEventListener('change', transcode);
