@@ -30,7 +30,6 @@ CONF_FLAGS=(
     --disable-iconv
     --disable-libxcb
     --disable-bsfs
-    --disable-filters
     --disable-parsers
     --disable-indevs
     --disable-outdevs

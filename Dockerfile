@@ -20,26 +20,18 @@ ENV FFMPEG_MT=$FFMPEG_MT
 RUN apt-get update && \
       apt-get install -y pkg-config autoconf automake libtool ragel
 
-# Build opus
-FROM emsdk-base AS opus-builder
-ENV OPUS_BRANCH=v1.3.1
-ADD https://github.com/ffmpegwasm/opus.git#$OPUS_BRANCH /src
-COPY build/opus.sh /src/build.sh
-RUN bash -x /src/build.sh
 
 # Base ffmpeg image with dependencies and source code populated.
 FROM emsdk-base AS ffmpeg-base
 RUN embuilder build sdl2 sdl2-mt
 ADD https://github.com/humeniukd/FFmpeg.git#wasm /src
-COPY --from=opus-builder $INSTALL_DIR $INSTALL_DIR
 
 # Build ffmpeg
 FROM ffmpeg-base AS ffmpeg-builder
 COPY build/ffmpeg.sh /src/build.sh
 RUN bash -x /src/build.sh \
-    --enable-libopus \
-    --enable-encoder=libopus \
-    --enable-muxer=webm
+    --enable-encoder=flac \
+    --enable-muxer=flac
 
 # Build ffmpeg.wasm
 FROM ffmpeg-builder AS ffmpeg-wasm-builder
@@ -48,8 +40,7 @@ COPY src/fftools /src/src/fftools
 COPY build/ffmpeg-wasm.sh build.sh
 
 # libraries to link
-ENV FFMPEG_LIBS \
-      -lopus
+ENV FFMPEG_LIBS ''
 RUN mkdir -p /src/dist/umd && bash -x /src/build.sh \
       ${FFMPEG_LIBS} \
       -o dist/umd/ffmpeg-core.js
