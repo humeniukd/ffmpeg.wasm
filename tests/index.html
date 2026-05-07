@@ -32,7 +32,7 @@
         const nb_samples = Math.ceil(parseFloat(text) * 48000/1800);
 
         message.innerHTML = text;
-        await ffmpeg.exec(['-i', name, '-map', '0:a:0', '-c:a', 'libfdk_aac', '-b:a', '160K', '-af', `aresample=48000,adumpwave=w=1800:n=${nb_samples}:f=output.csv`, '-ar', '48000', 'output.mp4']);
+        await ffmpeg.exec(['-i', name, '-map', '0:a:0', '-c:a', 'libfdk_aac', '-b:a', '160K', '-af', `aresample=44100,adumpwave=w=1800:n=${nb_samples}:f=output.csv`, '-ar', '44100', 'output.mp4']);
         const data = await ffmpeg.readFile('output.mp4');
         const data1 = await ffmpeg.readFile('output.csv');
         const csv = new TextDecoder().decode(data1.buffer);

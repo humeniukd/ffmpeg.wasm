@@ -37,7 +37,9 @@ CONF_FLAGS=(
   # ffmpeg source code
   src/fftools/cmdutils.c
   src/fftools/ffmpeg.c
+  src/fftools/ffmpeg_dec.c
   src/fftools/ffmpeg_demux.c
+  src/fftools/ffmpeg_enc.c
   src/fftools/ffmpeg_filter.c
   src/fftools/ffmpeg_hw.c
   src/fftools/ffmpeg_mux.c
