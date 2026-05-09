@@ -5,7 +5,7 @@
   </a>
 </p>
 
-# ffmpeg.wasm
+# ffmpeg8.wasm
 
 ffmpeg.wasm is a pure Webassembly / Javascript port of FFmpeg. It enables video & audio record, convert and stream right inside browsers.
 
