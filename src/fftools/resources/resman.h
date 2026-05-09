@@ -1,4 +1,6 @@
 /*
+ * Copyright (c) 2025 - softworkz
+ *
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -16,22 +18,33 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef FFTOOLS_OBJPOOL_H
-#define FFTOOLS_OBJPOOL_H
+#ifndef FFTOOLS_RESOURCES_RESMAN_H
+#define FFTOOLS_RESOURCES_RESMAN_H
 
-typedef struct ObjPool ObjPool;
+#include <stdint.h>
 
-typedef void* (*ObjPoolCBAlloc)(void);
-typedef void  (*ObjPoolCBReset)(void *);
-typedef void  (*ObjPoolCBFree)(void **);
+#include "config.h"
+#include "fftools/ffmpeg.h"
+#include "libavutil/avutil.h"
+#include "libavutil/bprint.h"
+#include "fftools/textformat/avtextformat.h"
 
-void     objpool_free(ObjPool **op);
-ObjPool *objpool_alloc(ObjPoolCBAlloc cb_alloc, ObjPoolCBReset cb_reset,
-                       ObjPoolCBFree cb_free);
-ObjPool *objpool_alloc_packets(void);
-ObjPool *objpool_alloc_frames(void);
+typedef enum {
+    FF_RESOURCE_GRAPH_CSS,
+    FF_RESOURCE_GRAPH_HTML,
+} FFResourceId;
 
-int  objpool_get(ObjPool *op, void **obj);
-void objpool_release(ObjPool *op, void **obj);
+typedef struct FFResourceDefinition {
+    FFResourceId resource_id;
+    const char *name;
 
-#endif // FFTOOLS_OBJPOOL_H
+    const unsigned char *data;
+    const unsigned *data_len;
+
+} FFResourceDefinition;
+
+void ff_resman_uninit(void);
+
+char *ff_resman_get_string(FFResourceId resource_id);
+
+#endif /* FFTOOLS_RESOURCES_RESMAN_H */

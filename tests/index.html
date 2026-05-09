@@ -29,7 +29,7 @@
         await ffmpeg.ffprobe(["-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", name, "-o", "output.txt"]);
         const probe = await ffmpeg.readFile("output.txt");
         const text = new TextDecoder().decode(probe.buffer);
-        const nb_samples = Math.ceil(parseFloat(text) * 48000/1800);
+        const nb_samples = Math.ceil(parseFloat(text) * 44100/1800);
 
         message.innerHTML = text;
         await ffmpeg.exec(['-i', name, '-map', '0:a:0', '-c:a', 'libfdk_aac', '-b:a', '160K', '-af', `aresample=44100,adumpwave=w=1800:n=${nb_samples}:f=output.csv`, '-ar', '44100', 'output.mp4']);
