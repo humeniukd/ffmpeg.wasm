@@ -1,7 +1,7 @@
 <html>
   <body>
     <h3>Quick Test</h3>
-    <video id="output-video" controls></video><br/>
+    <a id="output-video" download="fragmented.mp4">download</a><br/>
     <input type="file" id="uploader">
     <p id="message"></p>
     <script type="module">
@@ -32,14 +32,14 @@
         const nb_samples = Math.ceil(parseFloat(text) * 44100/1800);
 
         message.innerHTML = text;
-        await ffmpeg.exec(['-i', name, '-map', '0:a:0', '-c:a', 'libfdk_aac', '-b:a', '160K', '-af', `aresample=44100,adumpwave=w=1800:n=${nb_samples}:f=output.csv`, '-ar', '44100', 'output.mp4']);
+        await ffmpeg.exec(['-i', name, '-map', '0:a:0', '-c:a', 'libfdk_aac', '-b:a', '160K', '-filter:a', 'loudnorm', '-af', `aresample=44100,adumpwave=w=1800:n=${nb_samples}:f=output.csv`, '-ar', '44100', '-movflags', 'cmaf+faststart+frag_keyframe', '-frag_duration', '10000000', '-f', 'mp4', 'output.mp4']);
         const data = await ffmpeg.readFile('output.mp4');
         const data1 = await ffmpeg.readFile('output.csv');
         const csv = new TextDecoder().decode(data1.buffer);
         message.innerHTML = csv;
         const url = URL.createObjectURL(new Blob([data.buffer], { type: 'audio/mp4' }));
         const video = document.getElementById('output-video');
-        video.src = url;
+        video.href = url;
       }
       const elm = document.getElementById('uploader');
       elm.addEventListener('change', transcode);

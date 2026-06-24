@@ -2,7 +2,7 @@
 
 # Base emsdk image with environment variables.
 FROM emscripten/emsdk:5.0.7-arm64 AS emsdk-base
-ARG EXTRA_CFLAGS
+ARG EXTRA_CFLAGS="-O3 -msimd128"
 ARG EXTRA_LDFLAGS="-pthread -sPTHREAD_POOL_SIZE=32 -sINITIAL_MEMORY=1024MB"
 ARG FFMPEG_ST
 ARG FFMPEG_MT
@@ -36,6 +36,7 @@ FROM ffmpeg-base AS ffmpeg-builder
 COPY build/ffmpeg.sh /src/build.sh
 RUN bash -x /src/build.sh \
         --enable-filter=adumpwave \
+        --enable-filter=loudnorm \
         --enable-libfdk-aac \
         --enable-decoder=libfdk_aac \
         --enable-encoder=libfdk_aac \
