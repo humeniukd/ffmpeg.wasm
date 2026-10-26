@@ -1,13 +1,14 @@
 {
   "name": "root",
   "private": true,
+  "type": "module",
   "scripts": {
     "lint": "npm-run-all lint:*",
     "lint:packages": "npm run lint --workspace=packages --if-present",
     "lint:root": "eslint tests",
     "build": "npm run build --workspace=packages --if-present",
     "pretest": "npm run build",
-    "serve": "http-server -c-1 -s -p 3000 . --cors -H \"Cross-Origin-Embedder-Policy: require-corp\" -H \"Cross-Origin-Opener-Policy: same-origin\" -H \"Cross-Origin-Resource-Policy: cross-origin\" -H \"Origin-Agent-Cluster: ?1\"",
+    "serve": "http-server -c-1 -s -p 3001 . --cors -H \"Cross-Origin-Embedder-Policy: require-corp\" -H \"Cross-Origin-Opener-Policy: same-origin\" -H \"Cross-Origin-Resource-Policy: cross-origin\" -H \"Origin-Agent-Cluster: ?1\"",
     "test": "server-test test:browser:server 3000 test:all",
     "test:all": "npm-run-all test:browser:*:*",
     "test:browser": "mocha-headless-chrome -a enable-features=SharedArrayBuffer",

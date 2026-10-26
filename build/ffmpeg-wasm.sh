@@ -61,7 +61,6 @@ CONF_FLAGS=(
     src/fftools/textformat/tw_avio.c
     src/fftools/textformat/tw_buffer.c
     src/fftools/textformat/tw_stdout.c
-
 )
 
 emcc "${CONF_FLAGS[@]}" $@
