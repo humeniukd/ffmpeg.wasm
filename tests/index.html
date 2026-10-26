@@ -1,48 +1,67 @@
 <html>
   <body>
     <h3>Quick Test</h3>
-    <a id="output-video" download="fragmented.mp4">download</a><br/>
-    <input type="file" id="uploader">
+    <a id="output-video" download="output.wav">download</a><br/>
+    <button type="button" id="start">Start</button>
+    <button type="button" id="stop">Stop</button>
     <p id="message"></p>
     <script type="module">
       import { FFmpeg } from "/packages/ffmpeg/dist/esm/index.js";
       import { fetchFile } from "/packages/util/dist/esm/index.js";
-      let ffmpeg = null;
+      import { Recorder } from "./recorder.mjs";
+      import { wavHeader } from "./wav-header.js";
 
-      const transcode = async ({ target: { files } }) => {
-        const message = document.getElementById('message');
-        if (ffmpeg === null) {
-          ffmpeg = new FFmpeg();
-          ffmpeg.on("log", ({ message }) => {
-            console.log(message);
-          })
-          ffmpeg.on("progress", ({ progress }) => {
-            message.innerHTML = `${progress * 100} %`;
-          });
-          await ffmpeg.load({
-            coreURL: "/packages/core-mt/dist/esm/ffmpeg-core.js",
-          });
+      const message = document.getElementById('message');
+
+      let ffmpeg = new FFmpeg();
+      ffmpeg.on("log", ({message}) => {
+        console.log(message);
+      })
+      ffmpeg.on("progress", ({progress}) => {
+        message.innerHTML = `${progress * 100} %`;
+      });
+      await ffmpeg.load({
+        coreURL: "/packages/core-mt/dist/esm/ffmpeg-core.js",
+      });
+
+      let recorder = new Recorder(() => {
+        console.log("Permission denied");
+      });
+
+      const start = async () => {
+
+        recorder.ondataavailable = async (f32, channelCount, sampleRate) => {
+          const input = `input.wav`;
+          const output = `output.bin`;
+
+          console.log("f32", f32.length);
+
+          const header = wavHeader(f32.length, channelCount, sampleRate);
+
+          await ffmpeg.writeFile(input, new Uint8Array(f32.buffer));
+
+          console.log("f32:", f32.length);
+
+          await ffmpeg.exec(['-f', 'f32le', '-acodec', 'pcm_f32le', '-ac', `${channelCount}`, '-ar', `${sampleRate}`, '-i', input, '-filter:a', 'loudnorm=I=-14:TP=-1.5:LRA=11', '-f', 'f32le', '-acodec', 'pcm_f32le', '-ar', `${sampleRate}`, '-ac', `${channelCount}`, output]);
+          const data = await ffmpeg.readFile(output);
+
+
+
+          const url = URL.createObjectURL(new Blob([header, data], {type: 'audio/wav'}));
+          const video = document.getElementById('output-video');
+          video.href = url;
         }
 
-        const { name } = files[0];
-        await ffmpeg.writeFile(name, await fetchFile(files[0]));
-        await ffmpeg.ffprobe(["-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", name, "-o", "output.txt"]);
-        const probe = await ffmpeg.readFile("output.txt");
-        const text = new TextDecoder().decode(probe.buffer);
-        const nb_samples = Math.ceil(parseFloat(text) * 44100/1800);
+        await recorder.openStream();
 
-        message.innerHTML = text;
-        await ffmpeg.exec(['-i', name, '-map', '0:a:0', '-c:a', 'libfdk_aac', '-b:a', '160K', '-filter:a', 'loudnorm', '-af', `aresample=44100,adumpwave=w=1800:n=${nb_samples}:f=output.csv`, '-ar', '44100', '-movflags', 'cmaf+faststart+frag_keyframe', '-frag_duration', '10000000', '-f', 'mp4', 'output.mp4']);
-        const data = await ffmpeg.readFile('output.mp4');
-        const data1 = await ffmpeg.readFile('output.csv');
-        const csv = new TextDecoder().decode(data1.buffer);
-        message.innerHTML = csv;
-        const url = URL.createObjectURL(new Blob([data.buffer], { type: 'audio/mp4' }));
-        const video = document.getElementById('output-video');
-        video.href = url;
+        recorder.start();
       }
-      const elm = document.getElementById('uploader');
-      elm.addEventListener('change', transcode);
+      const startElm = document.getElementById('start');
+      startElm.addEventListener('click', start);
+      const stopElm = document.getElementById('stop');
+      stopElm.addEventListener('click', () => {
+        recorder.stop();
+      });
     </script>
   </body>
 </html>
