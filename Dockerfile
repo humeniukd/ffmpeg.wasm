@@ -8,7 +8,7 @@ ARG FFMPEG_ST
 ARG FFMPEG_MT
 ENV INSTALL_DIR=/opt
 
-ENV FFMPEG_VERSION=wasm8
+ENV FFMPEG_VERSION=wasm8.1
 ENV CFLAGS="-I$INSTALL_DIR/include $CFLAGS $EXTRA_CFLAGS"
 ENV CXXFLAGS="$CFLAGS"
 ENV LDFLAGS="-L$INSTALL_DIR/lib $LDFLAGS $CFLAGS $EXTRA_LDFLAGS"
@@ -35,12 +35,16 @@ COPY --from=fdkaac-builder $INSTALL_DIR $INSTALL_DIR
 FROM ffmpeg-base AS ffmpeg-builder
 COPY build/ffmpeg.sh /src/build.sh
 RUN bash -x /src/build.sh \
-        --enable-filter=adumpwave \
-        --enable-filter=loudnorm \
-        --enable-libfdk-aac \
-        --enable-decoder=libfdk_aac \
-        --enable-encoder=libfdk_aac \
-        --enable-muxer=mp4
+  --enable-filter=adumpwave \
+  --enable-filter=loudnorm \
+  --enable-libfdk-aac \
+  --enable-decoder=libfdk_aac \
+  --enable-encoder=libfdk_aac \
+  --enable-encoder=pcm_s16le \
+  --enable-muxer=pcm_s16le \
+  --enable-encoder=pcm_f32le \
+  --enable-muxer=pcm_f32le \
+  --enable-muxer=mp4
 
 # Build ffmpeg.wasm
 FROM ffmpeg-builder AS ffmpeg-wasm-builder
