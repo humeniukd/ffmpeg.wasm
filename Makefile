@@ -1,6 +1,8 @@
 all: dev
 
 MT_FLAGS := -sUSE_PTHREADS -pthread
+MT_LDFLAGS := -pthread -sPTHREAD_POOL_SIZE=32 -sINITIAL_MEMORY=1024MB
+ST_LDFLAGS := -sALLOW_MEMORY_GROWTH
 
 DEV_ARGS := --progress=plain
 
@@ -30,12 +32,14 @@ build:
 
 build-st:
 	make build \
-		FFMPEG_ST=yes
+		FFMPEG_ST=yes \
+		EXTRA_LDFLAGS="$(ST_LDFLAGS)"
 
 build-mt:
 	make build \
 		PKG_SUFFIX=-mt \
-		FFMPEG_MT=yes
+		FFMPEG_MT=yes \
+		EXTRA_LDFLAGS="$(MT_LDFLAGS)"
 
 dev:
 	make build-st EXTRA_CFLAGS="$(DEV_CFLAGS)" EXTRA_ARGS="$(DEV_ARGS)"

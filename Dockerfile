@@ -53,7 +53,7 @@ COPY src/fftools /src/src/fftools
 COPY build/ffmpeg-wasm.sh build.sh
 
 # libraries to link
-ENV FFMPEG_LIBS -O3 -lfdk-aac
+ENV FFMPEG_LIBS -lfdk-aac
 RUN mkdir -p /src/dist/umd && bash -x /src/build.sh \
       ${FFMPEG_LIBS} \
       -o dist/umd/ffmpeg-core.js
